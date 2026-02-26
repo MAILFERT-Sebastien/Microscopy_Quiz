@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)file:///C:/Users/Sebastien/Downloads/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Confocal Microscopy Quiz</title>
+<link href="./Confocal Microscopy Quiz_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1b2a;
+    --surface: #162032;
+    --surface2: #1e2d42;
+    --border: #2a3f58;
+    --text: #e8edf2;
+    --muted: #7a90a8;
+    --correct: #22c55e;
+    --correct-bg: rgba(34,197,94,0.12);
+    --wrong: #ef4444;
+    --wrong-bg: rgba(239,68,68,0.12);
+    --accent: #38bdf8;
+    --accent2: #f59e0b;
+    --pill: #1e3048;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    font-size: 16px;
+  }
+
+  /* ── INTRO SCREEN ── */
+  #intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 28px;
+    background: linear-gradient(160deg, #0d1b2a 0%, #0a2a40 100%);
+  }
+
+  .microscope-svg {
+    margin: 0 auto 32px;
+    display: block;
+  }
+
+  .intro-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .intro-title {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .intro-scenario {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #b8cfe0;
+    margin-bottom: 32px;
+  }
+
+  .intro-scenario strong {
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .fluorophore-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .fluoro-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .start-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0d1b2a;
+    border: none;
+    border-radius: 14px;
+    padding: 18px;
+    font-size: 1.05rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+
+  .start-btn:active { transform: scale(0.98); }
+
+  .q-count {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-top: 14px;
+  }
+
+  /* ── QUIZ SCREEN ── */
+  #quiz { display: none; min-height: 100vh; }
+
+  .top-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .q-indicator {
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+    font-family: 'Outfit', monospace;
+  }
+
+  .prog-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .prog-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+
+  .score-badge {
+    background: var(--pill);
+    color: var(--accent2);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .question-wrap {
+    padding: 24px 20px 100px;
+  }
+
+  .q-card {
+    display: none;
+    animation: fadeUp 0.35s ease;
+  }
+
+  .q-card.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .q-num {
+    background: var(--accent);
+    color: #0d1b2a;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  .q-type-badge {
+    background: var(--pill);
+    color: var(--muted);
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .q-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    line-height: 1.55;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  /* Illustration */
+  .illus {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 22px;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .opt {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.93rem;
+    line-height: 1.45;
+    transition: all 0.18s;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+  }
+
+  .opt:active:not(:disabled) { transform: scale(0.98); }
+
+  .opt:not(:disabled):hover {
+    border-color: var(--accent);
+    background: #1a2e42;
+  }
+
+  .opt-letter {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--pill);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .opt.correct {
+    border-color: var(--correct);
+    background: var(--correct-bg);
+    color: #86efac;
+  }
+  .opt.correct .opt-letter { background: var(--correct); color: #0d1b2a; }
+
+  .opt.wrong {
+    border-color: var(--wrong);
+    background: var(--wrong-bg);
+    color: #fca5a5;
+  }
+  .opt.wrong .opt-letter { background: var(--wrong); color: white; }
+  .opt:disabled { cursor: default; }
+
+  /* Explanation */
+  .expl {
+    margin-top: 16px;
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    display: none;
+    border-left: 3px solid;
+  }
+  .expl.show { display: block; animation: fadeUp 0.3s ease; }
+  .expl.ok { background: var(--correct-bg); border-color: var(--correct); color: #86efac; }
+  .expl.ko { background: var(--wrong-bg); border-color: var(--wrong); color: #fca5a5; }
+  .expl-title { font-weight: 600; margin-bottom: 6px; font-size: 0.92rem; }
+  .expl p { color: #b8cfe0; }
+
+  /* Next button */
+  .next-wrap {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 20px;
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+  }
+
+  .next-btn {
+    width: 100%;
+    background: var(--accent2);
+    color: #0d1b2a;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    transition: all 0.2s;
+  }
+  .next-btn:active { transform: scale(0.98); }
+  .next-btn.show { display: block; animation: fadeUp 0.25s ease; }
+
+  /* ── RESULTS SCREEN ── */
+  #results {
+    display: none;
+    min-height: 100vh;
+    padding: 48px 24px;
+    text-align: center;
+    background: linear-gradient(160deg, #0d1b2a 0%, #0a2a40 100%);
+  }
+
+  .score-ring {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    margin: 0 auto 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 6px solid var(--accent);
+    background: var(--surface);
+    position: relative;
+  }
+
+  .score-ring .big-score {
+    font-family: 'Fraunces', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .score-ring .score-denom {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .result-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+
+  .result-msg {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 36px;
+  }
+
+  .answers-recap {
+    text-align: left;
+    margin-bottom: 32px;
+  }
+
+  .recap-title {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .recap-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+  }
+
+  .recap-icon { font-size: 1rem; flex-shrink: 0; }
+
+  .restart-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0d1b2a;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ INTRO ══════════ -->
+<div id="intro">
+  <svg class="microscope-svg" width="80" height="80" viewBox="0 0 80 80" fill="none">
+    <circle cx="40" cy="40" r="38" fill="#162032" stroke="#2a3f58" stroke-width="2"></circle>
+    <rect x="36" y="12" width="8" height="22" rx="4" fill="#38bdf8"></rect>
+    <rect x="32" y="30" width="16" height="6" rx="3" fill="#0ea5e9"></rect>
+    <ellipse cx="40" cy="52" rx="10" ry="4" fill="#1e3048" stroke="#38bdf8" stroke-width="1.5"></ellipse>
+    <line x1="40" y1="56" x2="40" y2="64" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"></line>
+    <line x1="30" y1="64" x2="50" y2="64" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"></line>
+    <circle cx="40" cy="38" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2 2"></circle>
+  </svg>
+
+  <div class="intro-label">Institut Fresnel · Optical Microscopy</div>
+  <h1 class="intro-title">Confocal Microscopy<br>Quiz</h1>
+
+  <div class="intro-scenario">
+    <strong>🔬 Your scenario</strong>
+    You want to image <strong>fixed HeLa cells</strong> labeled with 3 fluorophores on a confocal microscope and acquire a 3D z-stack.
+    <div class="fluorophore-row">
+      <span class="fluoro-tag" style="background:rgba(96,120,220,0.2);color:#a5b4fc">
+        <span class="dot" style="background:#818cf8"></span> DAPI — nucleus
+      </span>
+      <span class="fluoro-tag" style="background:rgba(34,197,94,0.15);color:#86efac">
+        <span class="dot" style="background:#22c55e"></span> AF488 — actin
+      </span>
+      <span class="fluoro-tag" style="background:rgba(239,68,68,0.15);color:#fca5a5">
+        <span class="dot" style="background:#ef4444"></span> AF647 — membrane protein
+      </span>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+  <p class="q-count">5 questions · ~5 minutes</p>
+</div>
+
+<!-- ══════════ QUIZ ══════════ -->
+<div id="quiz">
+  <div class="top-bar">
+    <span class="q-indicator" id="q-indicator">1 / 5</span>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <span class="score-badge" id="score-badge">0 / 5</span>
+  </div>
+
+  <div class="question-wrap">
+
+    <!-- Q1 -->
+    <div class="q-card active" id="qcard-0">
+      <div class="q-header">
+        <span class="q-num">Q1</span>
+        <span class="q-type-badge">Multiple choice</span>
+      </div>
+      <p class="q-text">Which laser combination is best suited to excite DAPI, Alexa Fluor 488, and Alexa Fluor 647?</p>
+
+      <div class="illus">
+        <svg width="300" height="140" viewBox="0 0 300 140">
+          <!-- Spectrum bar -->
+          <defs>
+            <lineargradient id="spec" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%" stop-color="#7c3aed"></stop>
+              <stop offset="25%" stop-color="#3b82f6"></stop>
+              <stop offset="45%" stop-color="#22c55e"></stop>
+              <stop offset="65%" stop-color="#eab308"></stop>
+              <stop offset="80%" stop-color="#ef4444"></stop>
+              <stop offset="100%" stop-color="#7f1d1d"></stop>
+            </lineargradient>
+          </defs>
+          <rect x="20" y="100" width="260" height="10" rx="5" fill="url(#spec)" opacity="0.5"></rect>
+          <text x="20" y="125" fill="#7a90a8" font-size="9" font-family="Outfit">350nm</text>
+          <text x="270" y="125" fill="#7a90a8" font-size="9" font-family="Outfit">700nm</text>
+
+          <!-- DAPI excitation ~360nm -->
+          <line x1="46" y1="20" x2="46" y2="98" stroke="#818cf8" stroke-width="2.5" stroke-dasharray="4 2"></line>
+          <text x="40" y="15" fill="#818cf8" font-size="9" font-family="Outfit" text-anchor="middle">DAPI</text>
+
+          <!-- AF488 ~488nm -->
+          <line x1="118" y1="20" x2="118" y2="98" stroke="#22c55e" stroke-width="2.5" stroke-dasharray="4 2"></line>
+          <text x="118" y="15" fill="#22c55e" font-size="9" font-family="Outfit" text-anchor="middle">AF488</text>
+
+          <!-- AF647 ~650nm -->
+          <line x1="228" y1="20" x2="228" y2="98" stroke="#f87171" stroke-width="2.5" stroke-dasharray="4 2"></line>
+          <text x="228" y="15" fill="#f87171" font-size="9" font-family="Outfit" text-anchor="middle">AF647</text>
+
+          <!-- wavelength labels -->
+          <text x="46" y="138" fill="#818cf8" font-size="8" font-family="Outfit" text-anchor="middle">~405</text>
+          <text x="118" y="138" fill="#22c55e" font-size="8" font-family="Outfit" text-anchor="middle">~488</text>
+          <text x="228" y="138" fill="#f87171" font-size="8" font-family="Outfit" text-anchor="middle">~647</text>
+        </svg>
+      </div>
+
+      <div class="options">
+        <button class="opt" onclick="answer(0,0,false)"><span class="opt-letter">A</span><span>405 nm / 488 nm / 561 nm</span></button>
+        <button class="opt" onclick="answer(0,1,true)"><span class="opt-letter">B</span><span>405 nm / 488 nm / 638 nm</span></button>
+        <button class="opt" onclick="answer(0,2,false)"><span class="opt-letter">C</span><span>488 nm / 561 nm / 638 nm</span></button>
+        <button class="opt" onclick="answer(0,3,false)"><span class="opt-letter">D</span><span>405 nm / 561 nm / 638 nm</span></button>
+      </div>
+
+      <div class="expl" id="expl-0">
+        <div class="expl-title">💡 Explanation</div>
+        <p>DAPI absorbs around 360 nm → 405 nm laser is the closest standard line. Alexa Fluor 488 is optimally excited at 488 nm. Alexa Fluor 647 has its excitation peak ~650 nm → 638 nm is the standard confocal line. The 561 nm laser would excite AF488 poorly and is better suited to yellow/orange dyes (e.g. AF555, mCherry).</p>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card" id="qcard-1">
+      <div class="q-header">
+        <span class="q-num">Q2</span>
+        <span class="q-type-badge">Multiple choice</span>
+      </div>
+      <p class="q-text">You acquire your 3 channels simultaneously. Your green channel shows unexpected signal in the red channel. What is the most likely cause?</p>
+
+      <div class="illus">
+        <svg width="300" height="130" viewBox="0 0 300 130">
+          <!-- Green emission curve -->
+          <path d="M 60 110 Q 100 20 140 110" fill="rgba(34,197,94,0.2)" stroke="#22c55e" stroke-width="2"></path>
+          <text x="100" y="18" fill="#22c55e" font-size="9" font-family="Outfit" text-anchor="middle">AF488 emission</text>
+
+          <!-- Red detection window -->
+          <rect x="155" y="30" width="80" height="80" rx="6" fill="rgba(239,68,68,0.1)" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+          <text x="195" y="24" fill="#f87171" font-size="9" font-family="Outfit" text-anchor="middle">Red channel</text>
+          <text x="195" y="48" fill="#f87171" font-size="9" font-family="Outfit" text-anchor="middle">detection</text>
+          <text x="195" y="60" fill="#f87171" font-size="9" font-family="Outfit" text-anchor="middle">window</text>
+
+          <!-- Bleed-through arrow -->
+          <path d="M 138 75 Q 155 65 165 70" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arr)"></path>
+          <defs>
+            <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"></path>
+            </marker>
+          </defs>
+          <text x="148" y="58" fill="#f59e0b" font-size="8.5" font-family="Outfit">bleed-through</text>
+
+          <line x1="20" y1="110" x2="280" y2="110" stroke="#2a3f58" stroke-width="1"></line>
+          <text x="20" y="124" fill="#7a90a8" font-size="8" font-family="Outfit">500nm</text>
+          <text x="250" y="124" fill="#7a90a8" font-size="8" font-family="Outfit">700nm</text>
+        </svg>
+      </div>
+
+      <div class="options">
+        <button class="opt" onclick="answer(1,0,false)"><span class="opt-letter">A</span><span>The 638 nm laser is exciting AF488</span></button>
+        <button class="opt" onclick="answer(1,1,true)"><span class="opt-letter">B</span><span>AF488 emission spectrum overlaps with the red detection window (bleed-through)</span></button>
+        <button class="opt" onclick="answer(1,2,false)"><span class="opt-letter">C</span><span>DAPI is emitting in the red channel</span></button>
+        <button class="opt" onclick="answer(1,3,false)"><span class="opt-letter">D</span><span>The objective is misaligned</span></button>
+      </div>
+
+      <div class="expl" id="expl-1">
+        <div class="expl-title">💡 Explanation</div>
+        <p>This is spectral bleed-through (or crossover): the broad emission tail of AF488 leaks into the red detection window when all channels are acquired simultaneously. The solution is <strong>sequential acquisition</strong> — one laser/channel at a time — which eliminates cross-excitation and bleed-through artifacts.</p>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-card" id="qcard-2">
+      <div class="q-header">
+        <span class="q-num">Q3</span>
+        <span class="q-type-badge">Multiple choice</span>
+      </div>
+      <p class="q-text">You hesitate between two 63x objectives. Which is better suited for high-resolution imaging of subcellular structures in your fixed cells?</p>
+
+      <div class="illus">
+        <svg width="300" height="130" viewBox="0 0 300 130">
+          <!-- Objective A: water -->
+          <rect x="30" y="20" width="90" height="70" rx="8" fill="#1e2d42" stroke="#2a3f58" stroke-width="1.5"></rect>
+          <text x="75" y="38" fill="#7a90a8" font-size="9" font-family="Outfit" text-anchor="middle">63x / NA 1.2</text>
+          <text x="75" y="52" fill="#38bdf8" font-size="9" font-family="Outfit" text-anchor="middle">Water immersion</text>
+          <text x="75" y="66" fill="#7a90a8" font-size="8.5" font-family="Outfit" text-anchor="middle">n = 1.33</text>
+          <!-- water drops -->
+          <text x="75" y="82" fill="#60a5fa" font-size="11" font-family="Outfit" text-anchor="middle">💧</text>
+
+          <!-- VS -->
+          <text x="150" y="62" fill="#f59e0b" font-size="13" font-family="Fraunces" text-anchor="middle" font-weight="700">vs</text>
+
+          <!-- Objective B: oil -->
+          <rect x="180" y="20" width="90" height="70" rx="8" fill="#1a2e20" stroke="#22c55e" stroke-width="2"></rect>
+          <text x="225" y="38" fill="#7a90a8" font-size="9" font-family="Outfit" text-anchor="middle">63x / NA 1.4</text>
+          <text x="225" y="52" fill="#22c55e" font-size="9" font-family="Outfit" text-anchor="middle">Oil immersion</text>
+          <text x="225" y="66" fill="#7a90a8" font-size="8.5" font-family="Outfit" text-anchor="middle">n = 1.515</text>
+          <text x="225" y="82" fill="#a3e635" font-size="11" font-family="Outfit" text-anchor="middle">●</text>
+
+          <!-- Resolution formula -->
+          <text x="150" y="116" fill="#7a90a8" font-size="8.5" font-family="Outfit" text-anchor="middle">r = 0.61 λ / NA</text>
+        </svg>
+      </div>
+
+      <div class="options">
+        <button class="opt" onclick="answer(2,0,false)"><span class="opt-letter">A</span><span>63x / NA 1.2 — water immersion. Better index match with biological samples (n≈1.33)</span></button>
+        <button class="opt" onclick="answer(2,1,true)"><span class="opt-letter">B</span><span>63x / NA 1.4 — oil immersion. Higher NA gives better lateral resolution on fixed, mounted samples</span></button>
+        <button class="opt" onclick="answer(2,2,false)"><span class="opt-letter">C</span><span>Both are equivalent — NA does not affect resolution on fixed cells</span></button>
+        <button class="opt" onclick="answer(2,3,false)"><span class="opt-letter">D</span><span>63x / NA 1.2 — water is always better for fluorescence</span></button>
+      </div>
+
+      <div class="expl" id="expl-2">
+        <div class="expl-title">💡 Explanation</div>
+        <p>For <em>fixed cells</em> mounted in Mowiol (n≈1.52), oil immersion (n=1.515) provides an excellent index match → minimal spherical aberration. The higher NA (1.4 vs 1.2) gives ~15% better lateral resolution (r = 0.61λ/NA). Water objectives shine for <em>live</em> imaging where the aqueous medium (n≈1.33) matches the sample better.</p>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-card" id="qcard-3">
+      <div class="q-header">
+        <span class="q-num">Q4</span>
+        <span class="q-type-badge">Multiple choice</span>
+      </div>
+      <p class="q-text">You reduce the confocal pinhole from 2 AU to 0.5 AU. What are the consequences?</p>
+
+      <div class="illus">
+        <svg width="300" height="130" viewBox="0 0 300 130">
+          <!-- Left: large pinhole -->
+          <circle cx="75" cy="60" r="30" fill="none" stroke="#2a3f58" stroke-width="2"></circle>
+          <circle cx="75" cy="60" r="16" fill="rgba(248,197,60,0.25)" stroke="#f59e0b" stroke-width="2"></circle>
+          <text x="75" y="105" fill="#f59e0b" font-size="9" font-family="Outfit" text-anchor="middle">2 AU — large</text>
+          <!-- rays in focus + out of focus -->
+          <line x1="50" y1="35" x2="75" y2="60" stroke="#38bdf8" stroke-width="1.5" opacity="0.8"></line>
+          <line x1="100" y1="35" x2="75" y2="60" stroke="#38bdf8" stroke-width="1.5" opacity="0.8"></line>
+          <line x1="40" y1="20" x2="75" y2="60" stroke="#ef4444" stroke-width="1.5" opacity="0.5" stroke-dasharray="3 2"></line>
+          <line x1="110" y1="20" x2="75" y2="60" stroke="#ef4444" stroke-width="1.5" opacity="0.5" stroke-dasharray="3 2"></line>
+          <text x="75" y="18" fill="#ef4444" font-size="8" font-family="Outfit" text-anchor="middle">out-of-focus</text>
+
+          <!-- Arrow -->
+          <text x="150" y="65" fill="#f59e0b" font-size="20" font-family="Outfit" text-anchor="middle">→</text>
+
+          <!-- Right: small pinhole -->
+          <circle cx="225" cy="60" r="30" fill="none" stroke="#2a3f58" stroke-width="2"></circle>
+          <circle cx="225" cy="60" r="5" fill="rgba(34,197,94,0.35)" stroke="#22c55e" stroke-width="2"></circle>
+          <text x="225" y="105" fill="#22c55e" font-size="9" font-family="Outfit" text-anchor="middle">0.5 AU — small</text>
+          <line x1="205" y1="35" x2="225" y2="60" stroke="#38bdf8" stroke-width="1.5" opacity="0.8"></line>
+          <line x1="245" y1="35" x2="225" y2="60" stroke="#38bdf8" stroke-width="1.5" opacity="0.8"></line>
+          <!-- out of focus blocked -->
+          <line x1="190" y1="20" x2="225" y2="60" stroke="#ef4444" stroke-width="1.5" opacity="0.2" stroke-dasharray="3 2"></line>
+          <line x1="260" y1="20" x2="225" y2="60" stroke="#ef4444" stroke-width="1.5" opacity="0.2" stroke-dasharray="3 2"></line>
+          <text x="225" y="120" fill="#7a90a8" font-size="7.5" font-family="Outfit" text-anchor="middle">out-of-focus rejected ✓</text>
+
+          <text x="150" y="20" fill="#7a90a8" font-size="8" font-family="Outfit" text-anchor="middle">Pinhole size</text>
+        </svg>
+      </div>
+
+      <div class="options">
+        <button class="opt" onclick="answer(3,0,false)"><span class="opt-letter">A</span><span>Better axial resolution and more signal — always reduce the pinhole</span></button>
+        <button class="opt" onclick="answer(3,1,false)"><span class="opt-letter">B</span><span>No change — pinhole only affects image brightness, not resolution</span></button>
+        <button class="opt" onclick="answer(3,2,true)"><span class="opt-letter">C</span><span>Better axial resolution and optical sectioning, but significantly reduced signal → lower SNR</span></button>
+        <button class="opt" onclick="answer(3,3,false)"><span class="opt-letter">D</span><span>Better lateral resolution only — axial resolution is unaffected by the pinhole</span></button>
+      </div>
+
+      <div class="expl" id="expl-3">
+        <div class="expl-title">💡 Explanation</div>
+        <p>Reducing the pinhole rejects more out-of-focus light → improved axial (Z) resolution and optical sectioning. But it also blocks more in-focus photons → the signal drops significantly. Below ~0.5–1 AU, the gain in resolution is minimal while the SNR penalty becomes severe. The standard compromise is <strong>1 Airy Unit (AU)</strong>, which collects ~84% of in-focus light while still rejecting most out-of-focus background.</p>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-card" id="qcard-4">
+      <div class="q-header">
+        <span class="q-num">Q5</span>
+        <span class="q-type-badge">Multiple choice</span>
+      </div>
+      <p class="q-text">You use a 63x oil immersion objective (NA 1.4) designed for coverslip #1.5 (0.17 mm). Which mounting setup gives the best image quality?</p>
+
+      <div class="illus">
+        <svg width="300" height="120" viewBox="0 0 300 120">
+          <!-- Four setups as small diagrams -->
+          <!-- A: slide + PBS + no coverslip -->
+          <rect x="10" y="50" width="60" height="6" rx="1" fill="#334155"></rect>
+          <text x="40" y="45" fill="#7a90a8" font-size="7.5" font-family="Outfit" text-anchor="middle">Glass slide</text>
+          <text x="40" y="68" fill="#60a5fa" font-size="7" font-family="Outfit" text-anchor="middle">PBS</text>
+          <text x="40" y="80" fill="#ef4444" font-size="7.5" font-family="Outfit" text-anchor="middle">A ✗</text>
+
+          <!-- B: Petri plastic -->
+          <rect x="85" y="50" width="60" height="4" rx="1" fill="#78350f" opacity="0.8"></rect>
+          <text x="115" y="45" fill="#7a90a8" font-size="7.5" font-family="Outfit" text-anchor="middle">Plastic Petri</text>
+          <text x="115" y="64" fill="#fb923c" font-size="7" font-family="Outfit" text-anchor="middle">n=1.59 ≠ oil</text>
+          <text x="115" y="80" fill="#ef4444" font-size="7.5" font-family="Outfit" text-anchor="middle">B ✗</text>
+
+          <!-- C: correct — coverslip #1.5 + Mowiol -->
+          <rect x="160" y="56" width="60" height="3" rx="1" fill="#22c55e" opacity="0.9"></rect>
+          <rect x="160" y="50" width="60" height="6" rx="1" fill="#334155"></rect>
+          <text x="190" y="44" fill="#22c55e" font-size="7.5" font-family="Outfit" text-anchor="middle">#1.5 + Mowiol</text>
+          <text x="190" y="72" fill="#22c55e" font-size="7" font-family="Outfit" text-anchor="middle">n≈1.52 ✓</text>
+          <text x="190" y="84" fill="#22c55e" font-size="7.5" font-family="Outfit" text-anchor="middle">C ✓ BEST</text>
+
+          <!-- D: coverslip #1 + water -->
+          <rect x="235" y="56" width="60" height="2" rx="1" fill="#94a3b8" opacity="0.7"></rect>
+          <rect x="235" y="50" width="60" height="6" rx="1" fill="#334155"></rect>
+          <text x="265" y="44" fill="#7a90a8" font-size="7.5" font-family="Outfit" text-anchor="middle">#1 + water</text>
+          <text x="265" y="70" fill="#fb923c" font-size="7" font-family="Outfit" text-anchor="middle">wrong thickness</text>
+          <text x="265" y="82" fill="#ef4444" font-size="7.5" font-family="Outfit" text-anchor="middle">D ✗</text>
+
+          <!-- Oil drops below C -->
+          <text x="190" y="100" fill="#a3e635" font-size="8" font-family="Outfit" text-anchor="middle">oil (n=1.515)</text>
+          <line x1="190" y1="59" x2="190" y2="115" stroke="#a3e635" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"></line>
+
+          <text x="150" y="116" fill="#7a90a8" font-size="7.5" font-family="Outfit" text-anchor="middle">← objective below (inverted microscope) →</text>
+        </svg>
+      </div>
+
+      <div class="options">
+        <button class="opt" onclick="answer(4,0,false)"><span class="opt-letter">A</span><span>Cells on glass slide + PBS + no coverslip → oil objective</span></button>
+        <button class="opt" onclick="answer(4,1,false)"><span class="opt-letter">B</span><span>Cells in plastic Petri dish + culture medium → oil objective from below</span></button>
+        <button class="opt" onclick="answer(4,2,true)"><span class="opt-letter">C</span><span>Cells on coverslip #1.5 + Mowiol mounting medium (n≈1.52) + glass slide → oil objective</span></button>
+        <button class="opt" onclick="answer(4,3,false)"><span class="opt-letter">D</span><span>Cells on coverslip #1 (0.13 mm) + water + glass slide → oil objective</span></button>
+      </div>
+
+      <div class="expl" id="expl-4">
+        <div class="expl-title">💡 Explanation</div>
+        <p>Three parameters must be aligned: (1) <strong>Coverslip #1.5 = 0.17 mm</strong> matches the objective's optical correction. (2) <strong>Mowiol (n≈1.52)</strong> closely matches the oil (n=1.515) → minimal spherical aberration. (3) Oil immersion fills the gap between objective and coverslip. Plastic Petri (n=1.59) and PBS (n=1.33) both cause refractive index mismatch. A #1 coverslip (0.13 mm) shifts the focal correction and degrades the PSF, especially in Z.</p>
+      </div>
+    </div>
+
+  </div><!-- end question-wrap -->
+
+  <div class="next-wrap">
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+  </div>
+</div>
+
+<!-- ══════════ RESULTS ══════════ -->
+<div id="results">
+  <div class="score-ring">
+    <span class="big-score" id="final-score">0</span>
+    <span class="score-denom">/ 5</span>
+  </div>
+  <h2 class="result-title" id="result-title">Well done!</h2>
+  <p class="result-msg" id="result-msg">Here's your summary:</p>
+
+  <div class="answers-recap">
+    <div class="recap-title">Your answers</div>
+    <div id="recap-list"></div>
+  </div>
+
+  <button class="restart-btn" onclick="restart()">↩ Try again</button>
+</div>
+
+<script>
+  const QUESTIONS = [
+    "Laser selection",
+    "Sequential vs. simultaneous acquisition",
+    "Oil vs. water immersion objective",
+    "Pinhole size — trade-off",
+    "Coverslip, mounting medium & objective"
+  ];
+
+  let current = 0;
+  let score = 0;
+  let answers = [];
+  let answered = false;
+
+  function startQuiz() {
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    updateBar();
+  }
+
+  function answer(qIdx, optIdx, isCorrect) {
+    if (answered) return;
+    answered = true;
+
+    const card = document.getElementById(`qcard-${qIdx}`);
+    const opts = card.querySelectorAll('.opt');
+    opts.forEach(o => o.disabled = true);
+
+    opts[optIdx].classList.add(isCorrect ? 'correct' : 'wrong');
+    if (!isCorrect) {
+      // reveal correct
+      opts.forEach((o, i) => {
+        if (o.onclick.toString().includes('true')) o.classList.add('correct');
+      });
+    }
+
+    if (isCorrect) score++;
+    answers.push({ q: QUESTIONS[qIdx], correct: isCorrect });
+
+    const expl = document.getElementById(`expl-${qIdx}`);
+    expl.classList.add('show', isCorrect ? 'ok' : 'ko');
+
+    document.getElementById('score-badge').textContent = `${score} / 5`;
+
+    const btn = document.getElementById('next-btn');
+    btn.textContent = current === 4 ? 'See results →' : 'Next →';
+    btn.classList.add('show');
+  }
+
+  function nextQuestion() {
+    if (current === 4) { showResults(); return; }
+
+    document.getElementById(`qcard-${current}`).classList.remove('active');
+    current++;
+    answered = false;
+    document.getElementById(`qcard-${current}`).classList.add('active');
+    document.getElementById('next-btn').classList.remove('show');
+    updateBar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateBar() {
+    document.getElementById('q-indicator').textContent = `${current + 1} / 5`;
+    document.getElementById('prog-fill').style.width = `${(current / 5) * 100}%`;
+  }
+
+  function showResults() {
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('final-score').textContent = score;
+
+    const titles = ['Keep practicing! 💪', 'Good effort! 👍', 'Nice work! 🎯', 'Very good! 🔬', 'Almost perfect! ⭐', 'Perfect score! 🏆'];
+    const msgs = [
+      'Review the key concepts and try again.',
+      'You got some right — review the explanations.',
+      'Solid foundations, a few details to review.',
+      'You clearly understand confocal microscopy!',
+      'Excellent — just one slip!',
+      'Outstanding! You master confocal microscopy setup.'
+    ];
+    document.getElementById('result-title').textContent = titles[score];
+    document.getElementById('result-msg').textContent = msgs[score];
+
+    const list = document.getElementById('recap-list');
+    list.innerHTML = answers.map((a, i) =>
+      `<div class="recap-item">
+        <span class="recap-icon">${a.correct ? '✅' : '❌'}</span>
+        <span>Q${i+1} — ${a.q}</span>
+      </div>`
+    ).join('');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function restart() {
+    current = 0; score = 0; answers = []; answered = false;
+    document.querySelectorAll('.q-card').forEach((c, i) => {
+      c.classList.toggle('active', i === 0);
+      c.querySelectorAll('.opt').forEach(o => {
+        o.classList.remove('correct', 'wrong');
+        o.disabled = false;
+      });
+      const expl = document.getElementById(`expl-${i}`);
+      expl.classList.remove('show', 'ok', 'ko');
+    });
+    document.getElementById('next-btn').classList.remove('show');
+    document.getElementById('score-badge').textContent = '0 / 5';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    updateBar();
+  }
+</script>
+
+
+</body></html>
